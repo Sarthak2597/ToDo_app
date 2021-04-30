@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from pytz import timezone
 
 app = Flask(__name__)
 
@@ -12,7 +13,8 @@ class Todo(db.Model):
     sno = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     desc = db.Column(db.String(500), nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    utc=datetime.now(timezone('UTC'))
+    date_created = db.Column(db.DateTime, default=utc.astimezone(timezone('Asia/Kolkata')))
 
     def __repr__(self) -> str:
         return f"{self.sno} - {self.title}"
@@ -56,6 +58,10 @@ def delete(sno):
     db.session.delete(todo)
     db.session.commit()
     return redirect("/")
+
+@app.route('/about', methods=['GET', 'POST'])
+def about():
+    return render_template('About.html')
 
 if __name__=="__main__":
     app.run(debug=True)
